@@ -13,7 +13,7 @@
     "test": "npm run test -w @paper-book-traces/api && npm run test -w @paper-book-traces/web",
     "test:e2e": "npm run test:e2e -w @paper-book-traces/web",
     "lint": "eslint .",
-    "typecheck": "npm run typecheck -w @paper-book-traces/api && npm run typecheck -w @paper-book-traces/web",
+    "typecheck": "npm run typecheck:test -w @paper-book-traces/api && npm run typecheck -w @paper-book-traces/web",
     "db:generate": "npm run db:generate -w @paper-book-traces/api",
     "db:migrate": "npm run db:migrate -w @paper-book-traces/api",
     "db:migrate:dev": "npm run db:migrate:dev -w @paper-book-traces/api",
