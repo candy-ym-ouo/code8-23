@@ -452,6 +452,8 @@ export const bookRoutes: FastifyPluginAsync = async (app) => {
     const bookId = parseId((request.params as { bookId: string }).bookId, 'bookId');
     const userId = currentUser(request).id;
     await prisma.$transaction(async (tx) => {
+      // 锁定书目行，让并发删除在同一把锁上排队；第二个事务只能看到 deletedAt 非空。
+      await tx.$queryRaw`SELECT id FROM books WHERE id = ${bookId}::uuid AND user_id = ${userId}::uuid FOR UPDATE`;
       const book = await tx.book.findFirst({ where: { id: bookId, userId, deletedAt: null } });
       if (!book) throw new AppError(404, 'NOT_FOUND', '书目不存在');
       const existingVersion = (request.body as { version?: number } | undefined)?.version;

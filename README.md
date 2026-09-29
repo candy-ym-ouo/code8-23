@@ -123,6 +123,22 @@ npm run build
 npm test
 ```
 
+API 集成测试位于 `apps/api/tests/`，使用 `embedded-postgres` 自动拉起临时 PostgreSQL 16
+集群并执行真实迁移，无需本机安装或预启动数据库。覆盖：
+
+- 并发页码校验（同页折角竞争、并发移动、批注区间）；
+- 父书目软删级联与并发重复删除（行锁串行化）；
+- 24 小时恢复窗口（窗口内、过期、边界、父书目已删、同页冲突）；
+- 折角与完成感受的部分唯一索引（含绕过应用层的数据库级验证）；
+- 导出行数上限（`EXPORT_MAX_ROWS`、`includeDeleted` 计数差异、413 响应）；
+- 固定种子（mulberry32）的随机调度，多次运行收敛到完全相同的最终一致状态。
+
+仅运行集成测试：
+
+```bash
+npm run test -w @paper-book-traces/api
+```
+
 端到端测试需要 PostgreSQL、API 和 Web 已可运行：
 
 ```bash

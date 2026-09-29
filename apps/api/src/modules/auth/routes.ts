@@ -1,5 +1,6 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { z } from 'zod';
+import { env } from '../../config/env.js';
 import { prisma } from '../../lib/prisma.js';
 import { AppError, zodFields } from '../../lib/errors.js';
 import {
@@ -38,10 +39,12 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
     '/register',
     {
       config: {
-        rateLimit: {
-          max: 5,
-          timeWindow: '1 hour'
-        }
+        rateLimit: env.NODE_ENV === 'test'
+          ? false
+          : {
+              max: 5,
+              timeWindow: '1 hour'
+            }
       }
     },
     async (request, reply) => {
@@ -65,14 +68,16 @@ export const authRoutes: FastifyPluginAsync = async (app) => {
     '/login',
     {
       config: {
-        rateLimit: {
-          max: 10,
-          timeWindow: '15 minutes',
-          keyGenerator: (request) => {
-            const body = request.body as { email?: string } | undefined;
-            return `${request.ip}:${String(body?.email ?? '').toLowerCase()}`;
-          }
-        }
+        rateLimit: env.NODE_ENV === 'test'
+          ? false
+          : {
+              max: 10,
+              timeWindow: '15 minutes',
+              keyGenerator: (request) => {
+                const body = request.body as { email?: string } | undefined;
+                return `${request.ip}:${String(body?.email ?? '').toLowerCase()}`;
+              }
+            }
       }
     },
     async (request, reply) => {
